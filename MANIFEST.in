@@ -1,0 +1,6 @@
+include README
+recursive-include * *.py
+recursive-include * *.jpg
+recursive-include * *.de
+recursive-include * *.en
+recursive-include * *.meta
