@@ -1,0 +1,7 @@
+FROM tensorflow/tensorflow:latest-gpu 
+ENV UNIT=gpu
+
+WORKDIR /ai-benchmark
+ADD . /ai-benchmark
+
+RUN pip install .

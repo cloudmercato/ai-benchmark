@@ -3,3 +3,4 @@ ai_benchmark.egg-info
 dist
 __pycache__
 .DS_Store
+*.sw[pon]
