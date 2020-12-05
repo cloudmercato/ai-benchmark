@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright 2019-2020 by Andrey Ignatov. All Rights Reserved.
 
-from __future__ import print_function
+import logging
 from ai_benchmark.utils import *
 
 
@@ -24,7 +24,6 @@ class AIBenchmark:
                 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
                 if self.tf_ver_2:
-                    import logging
                     logger = tf.get_logger()
                     logger.disabled = True
                     logger.setLevel(logging.ERROR)
@@ -38,7 +37,6 @@ class AIBenchmark:
             else:
 
                 if self.tf_ver_2:
-                    import logging
                     logger = tf.get_logger()
                     logger.disabled = True
                     logger.setLevel(logging.INFO)
@@ -60,24 +58,30 @@ class AIBenchmark:
             self.use_CPU = True
 
     def run(self, precision="normal"):
-        return run_tests(training=True, inference=True, micro=False, verbose=self.verbose,
-                         use_CPU=self.use_CPU, precision=precision, _type="full", start_dir=self.cwd)
+        return run_tests(
+            training=True, inference=True, micro=False, verbose=self.verbose,
+            use_CPU=self.use_CPU, precision=precision, _type="full", start_dir=self.cwd
+        )
 
     def run_inference(self, precision="normal"):
-        return run_tests(training=False, inference=True, micro=False, verbose=self.verbose,
-                         use_CPU=self.use_CPU, precision=precision, _type="inference", start_dir=self.cwd)
+        return run_tests(
+            training=False, inference=True, micro=False, verbose=self.verbose,
+            use_CPU=self.use_CPU, precision=precision, _type="inference", start_dir=self.cwd
+        )
 
     def run_training(self, precision="normal"):
-        return run_tests(training=True, inference=False, micro=False, verbose=self.verbose,
-                         use_CPU=self.use_CPU, precision=precision, _type="training", start_dir=self.cwd)
+        return run_tests(
+            training=True, inference=False, micro=False, verbose=self.verbose,
+            use_CPU=self.use_CPU, precision=precision, _type="training", start_dir=self.cwd
+        )
 
     def run_micro(self, precision="normal"):
-        return run_tests(training=False, inference=False, micro=True, verbose=self.verbose,
-                         use_CPU=self.use_CPU, precision=precision, _type="micro", start_dir=self.cwd)
+        return run_tests(
+            training=False, inference=False, micro=True, verbose=self.verbose,
+            use_CPU=self.use_CPU, precision=precision, _type="micro", start_dir=self.cwd
+        )
 
 
 if __name__ == "__main__":
-
     benchmark = AIBenchmark(use_CPU=None, verbose_level=1)
     results = benchmark.run(precision="normal")
-
