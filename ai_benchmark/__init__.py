@@ -7,6 +7,13 @@ import numpy as np
 import tensorflow as tf
 from ai_benchmark import utils
 
+handler = logging.StreamHandler()
+logger = logging.getLogger('ai_benchmark')
+logger.addHandler(handler)
+
+VERSION = (0, 1, 2, 'cm')
+__version__ = '.'.join([str(i) for i in VERSION])
+
 
 class AIBenchmark:
 
@@ -14,9 +21,9 @@ class AIBenchmark:
 
         self.tf_ver_2 = utils.parse_version(tf.__version__) > utils.parse_version('1.99')
         self.verbose = verbose_level
+        logger.setLevel(30 - self.verbose*10)
 
-        if verbose_level > 0:
-            utils.print_intro()
+        utils.print_intro()
 
         np.warnings.filterwarnings('ignore')
 
@@ -27,11 +34,11 @@ class AIBenchmark:
                 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
                 if self.tf_ver_2:
-                    logger = tf.get_logger()
-                    logger.disabled = True
-                    logger.setLevel(logging.ERROR)
+                    tf_logger = tf.get_logger()
+                    tf_logger.disabled = True
+                    tf_logger.setLevel(logging.ERROR)
 
-                elif parse_version(tf.__version__) > parse_version('1.13'):
+                elif utils.parse_version(tf.__version__) > utils.parse_version('1.13'):
                     tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
                 else:
@@ -40,18 +47,18 @@ class AIBenchmark:
             else:
 
                 if self.tf_ver_2:
-                    logger = tf.get_logger()
-                    logger.disabled = True
-                    logger.setLevel(logging.INFO)
+                    tf_logger = tf.get_logger()
+                    tf_logger.disabled = True
+                    tf_logger.setLevel(logging.INFO)
 
-                elif parse_version(tf.__version__) > parse_version('1.13'):
+                elif utils.parse_version(tf.__version__) > utils.parse_version('1.13'):
                     tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
                 else:
                     tf.logging.set_verbosity(tf.logging.INFO)
 
-        except:
-            pass
+        except Exception as err:
+            logger.warning("%s", err)
 
         np.random.seed(seed)
         self.cwd = os.path.dirname(__file__)

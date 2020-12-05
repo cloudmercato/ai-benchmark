@@ -8,6 +8,7 @@ import platform
 import cpuinfo
 import time
 import multiprocessing
+import logging
 
 from psutil import virtual_memory
 import numpy as np
@@ -21,6 +22,8 @@ from ai_benchmark.config import TestConstructor
 from ai_benchmark.models import *
 
 MAX_TEST_DURATION = 100
+
+logger = logging.getLogger('ai_benchmark')
 
 
 class BenchmarkResults:
@@ -270,38 +273,32 @@ def print_test_results(prefix, batch_size, dimensions, mean, std, verbose):
                                                                      dimensions[2], mean, std)
 
     try:
-        print(prt_str)
+        logger.info(prt_str)
     except:
         prt_str = prt_str.replace("±", "ms, std:")
-        print(prt_str)
+        logger.info(prt_str)
 
 
 def print_intro():
-
-    print("\n>>   AI-Benchmark-v.0.1.2   ")
-    print(">>   Let the AI Games begin..\n")
-
-    # print("\n>>   𝓐𝓘-𝓑𝓮𝓷𝓬𝓱𝓶𝓪𝓻𝓴-𝓿.0.1.2   ")
-    # print(">>   𝐿𝑒𝓉 𝓉𝒽𝑒 𝒜𝐼 𝒢𝒶𝓂𝑒𝓈 𝒷𝑒𝑔𝒾𝓃..\n")
+    import ai_benchmark
+    logger.info(">>   AI-Benchmark - %s", ai_benchmark.__version__)
+    logger.info(">>   Let the AI Games begin")
 
 
 def print_test_info(testInfo):
-
-    print("*  TF Version: " + testInfo.tf_version)
-    print("*  Platform: " + testInfo.platform_info)
-    print("*  CPU: " + testInfo.cpu_model)
-    print("*  CPU RAM: " + testInfo.cpu_ram + " GB")
+    logger.info("*  TF Version: %s", testInfo.tf_version)
+    logger.info("*  Platform: %s", testInfo.platform_info)
+    logger.info("*  CPU: %s", testInfo.cpu_model)
+    logger.info("*  CPU RAM: %s GB", testInfo.cpu_ram)
 
     if not testInfo.is_cpu_inference:
 
-        gpu_id = 0
-        for gpu_info in testInfo.gpu_devices:
-            print("*  GPU/" + str(gpu_id) + ": " + gpu_info[0])
-            print("*  GPU RAM: " + gpu_info[1] + " GB")
-            gpu_id += 1
+        for gpu_id, gpu_info in enumerate(testInfo.gpu_devices):
+            logger.info("*  GPU/%s: %s", gpu_id, gpu_info[0])
+            logger.info("*  GPU RAM: %s GB", gpu_info[1])
 
-        print("*  CUDA Version: " + testInfo.cuda_version)
-        print("*  CUDA Build: " + testInfo.cuda_build)
+        logger.info("*  CUDA Version: %s", testInfo.cuda_version)
+        logger.info("*  CUDA Build: %s", testInfo.cuda_build)
 
     update_info("launch", testInfo)
 
@@ -423,7 +420,7 @@ def get_cuda_info():
     cuda_build = "N/A"
 
     try:
-        cuda_info = str(subprocess.check_output(["nvcc",  "--version"]))
+        cuda_info = str(subprocess.check_output(["nvcc", "--version"]))
         cuda_info = cuda_info[cuda_info.find("release"):]
         cuda_version = cuda_info[cuda_info.find(" ") + 1:cuda_info.find(",")]
         cuda_build = cuda_info[cuda_info.find(",") + 2:cuda_info.find("\\")]
@@ -434,9 +431,9 @@ def get_cuda_info():
 
 
 def print_test_start():
-    print("\nThe benchmark is running...")
-    print("The tests might take up to 20 minutes")
-    print("Please don't interrupt the script")
+    logger.warning("The benchmark is running...")
+    logger.warning("The tests might take up to 20 minutes")
+    logger.warning("Please don't interrupt the script")
 
 
 def print_scores(testInfo, public_results):
@@ -464,11 +461,10 @@ def print_scores(testInfo, public_results):
 
         update_info("scores", testInfo)
 
-        if testInfo.verbose_level > 0:
-            print("\nDevice Inference Score: " + str(testInfo.results.inference_score))
-            print("Device Training Score: " + str(testInfo.results.training_score))
-            print("Device AI Score: " + str(testInfo.results.ai_score) + "\n")
-            print("For more information and results, please visit http://ai-benchmark.com/alpha\n")
+        logger.info("Device Inference Score: %s", testInfo.results.inference_score)
+        logger.info("Device Training Score: %s", testInfo.results.training_score)
+        logger.info("Device AI Score: %s", testInfo.results.ai_score)
+        logger.info("For more information and results, please visit http://ai-benchmark.com/alpha\n")
 
     if testInfo._type == "inference":
 
@@ -479,9 +475,8 @@ def print_scores(testInfo, public_results):
 
         update_info("scores", testInfo)
 
-        if testInfo.verbose_level > 0:
-            print("\nDevice Inference Score: " + str(testInfo.results.inference_score) + "\n")
-            print("For more information and results, please visit http://ai-benchmark.com/alpha\n")
+        logger.info("Device Inference Score: %s", testInfo.results.inference_score)
+        logger.info("For more information and results, please visit http://ai-benchmark.com/alpha\n")
 
     if testInfo._type == "training":
 
@@ -492,9 +487,8 @@ def print_scores(testInfo, public_results):
 
         update_info("scores", testInfo)
 
-        if testInfo.verbose_level > 0:
-            print("\nDevice Training Score: " + str(testInfo.results.training_score) + "\n")
-            print("For more information and results, please visit http://ai-benchmark.com/alpha\n")
+        logger.info("Device Training Score: %s", testInfo.results.training_score)
+        logger.info("For more information and results, please visit http://ai-benchmark.com/alpha\n")
 
     if testInfo._type == "micro":
 
@@ -505,9 +499,8 @@ def print_scores(testInfo, public_results):
 
         update_info("scores", testInfo)
 
-        if testInfo.verbose_level > 0:
-            print("\nDevice Inference Score: " + str(testInfo.results.inference_score) + "\n")
-            print("For more information and results, please visit http://ai-benchmark.com/alpha\n")
+        logger.info("Device Inference Score: %s", testInfo.results.inference_score)
+        logger.info("For more information and results, please visit http://ai-benchmark.com/alpha\n")
 
     return public_results
 
@@ -522,10 +515,9 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
 
     testInfo = TestInfo(_type, precision, use_CPU, verbose)
 
-    if verbose > 0:
-        print_test_info(testInfo)
-        print_test_start()
-        time.sleep(2)
+    print_test_info(testInfo)
+    print_test_start()
+    time.sleep(2)
 
     benchmark_tests = TestConstructor().getTests()
     benchmark_results = BenchmarkResults()
@@ -548,8 +540,8 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
 
     for test in benchmark_tests:
 
-        if verbose > 0 and not (micro and len(test.micro) == 0):
-            print("\n" + str(test.id) + "/" + str(len(benchmark_tests)) + ". " + test.model + "\n")
+        if not (micro and len(test.micro) == 0):
+            logger.info("\n%s/%s. %s\n", test.id, len(benchmark_tests), test.model)
         sub_id = 1
 
         tf.compat.v1.reset_default_graph() if testInfo.tf_ver_2 else tf.reset_default_graph()
@@ -587,8 +579,7 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
                             inference_time = get_time_ms() - time_iter_started
                             inference_times.append(inference_time)
 
-                            if verbose > 1:
-                                print("Inference Time: " + str(inference_time) + " ms")
+                            logger.debug("Inference Time: %s ms", inference_time)
 
                     time_mean, time_std = compute_stats(inference_times)
 
@@ -639,11 +630,7 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
                             training_time = get_time_ms() - time_iter_started
                             training_times.append(training_time)
 
-                            if verbose > 1:
-                                if i == 0 and inference:
-                                    print("\nTraining Time: " + str(training_time) + " ms")
-                                else:
-                                    print("Training Time: " + str(training_time) + " ms")
+                            logger.debug("Training Time: %s ms", training_time)
 
                     time_mean, time_std = compute_stats(training_times)
 
