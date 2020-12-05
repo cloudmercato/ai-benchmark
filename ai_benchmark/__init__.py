@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
 # Copyright 2019-2020 by Andrey Ignatov. All Rights Reserved.
 
+import os
 import logging
-from ai_benchmark.utils import *
+import numpy as np
+import tensorflow as tf
+from ai_benchmark import utils
 
 
 class AIBenchmark:
 
     def __init__(self, use_CPU=None, verbose_level=1):
 
-        self.tf_ver_2 = parse_version(tf.__version__) > parse_version('1.99')
+        self.tf_ver_2 = utils.parse_version(tf.__version__) > utils.parse_version('1.99')
         self.verbose = verbose_level
 
         if verbose_level > 0:
-            printIntro()
+            utils.print_intro()
 
         np.warnings.filterwarnings('ignore')
 
@@ -51,32 +54,32 @@ class AIBenchmark:
             pass
 
         np.random.seed(42)
-        self.cwd = path.dirname(__file__)
+        self.cwd = os.path.dirname(__file__)
 
         self.use_CPU = False
         if use_CPU:
             self.use_CPU = True
 
     def run(self, precision="normal"):
-        return run_tests(
+        return utils.run_tests(
             training=True, inference=True, micro=False, verbose=self.verbose,
             use_CPU=self.use_CPU, precision=precision, _type="full", start_dir=self.cwd
         )
 
     def run_inference(self, precision="normal"):
-        return run_tests(
+        return utils.run_tests(
             training=False, inference=True, micro=False, verbose=self.verbose,
             use_CPU=self.use_CPU, precision=precision, _type="inference", start_dir=self.cwd
         )
 
     def run_training(self, precision="normal"):
-        return run_tests(
+        return utils.run_tests(
             training=True, inference=False, micro=False, verbose=self.verbose,
             use_CPU=self.use_CPU, precision=precision, _type="training", start_dir=self.cwd
         )
 
     def run_micro(self, precision="normal"):
-        return run_tests(
+        return utils.run_tests(
             training=False, inference=False, micro=True, verbose=self.verbose,
             use_CPU=self.use_CPU, precision=precision, _type="micro", start_dir=self.cwd
         )

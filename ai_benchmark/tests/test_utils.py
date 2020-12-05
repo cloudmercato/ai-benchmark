@@ -10,7 +10,7 @@ class RunTestsTest(unittest.TestCase):
             training=True,
             inference=True,
             micro=False,
-            verbose=1,
+            verbose=0,
             use_CPU=None,
             precision='dry',
             _type="full",

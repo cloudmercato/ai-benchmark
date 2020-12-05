@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 # Copyright 2019-2020 by Andrey Ignatov. All Rights Reserved.
 
-import tensorflow as tf
-import numpy as np
-from psutil import virtual_memory
-from tensorflow.python.client import device_lib
-from pkg_resources import parse_version
-import multiprocessing
-from PIL import Image
+import os
 from os import path
 import subprocess
 import platform
 import cpuinfo
 import time
-import os
+import multiprocessing
+
+from psutil import virtual_memory
+import numpy as np
+import tensorflow as tf
+from tensorflow.python.client import device_lib
+from pkg_resources import parse_version
+from PIL import Image
 
 from ai_benchmark.update_utils import update_info
 from ai_benchmark.config import TestConstructor
@@ -62,27 +63,27 @@ class TestInfo:
     def __init__(self, _type, precision, use_CPU, verbose):
 
         self._type = _type
-        self.tf_version = getTFVersion()
+        self.tf_version = get_tf_version()
         self.tf_ver_2 = parse_version(self.tf_version) > parse_version('1.99')
-        self.platform_info = getPlatformInfo()
-        self.cpu_model = getCpuModel()
-        self.cpu_cores = getNumCpuCores()
-        self.cpu_ram = getCpuRAM()
-        self.is_cpu_build = isCPUBuild()
-        self.is_cpu_inference = (isCPUBuild() or use_CPU)
-        self.gpu_devices = getGpuModels()
-        self.cuda_version, self.cuda_build = getCudaInfo()
+        self.platform_info = get_platform_info()
+        self.cpu_model = get_cpu_model()
+        self.cpu_cores = get_num_cpu_cores()
+        self.cpu_ram = get_cpu_ram()
+        self.is_cpu_build = is_cpu_build()
+        self.is_cpu_inference = (is_cpu_build() or use_CPU)
+        self.gpu_devices = get_gpu_models()
+        self.cuda_version, self.cuda_build = get_cuda_info()
         self.precision = precision
         self.verbose_level = verbose
         self.results = None
         self.path = path.dirname(__file__)
 
 
-def getTimeSeconds():
+def get_time_seconds():
     return int(time.time())
 
 
-def getTimeMillis():
+def get_time_ms():
     return int(round(time.time() * 1000))
 
 
@@ -114,7 +115,7 @@ def resize_image(image, dimensions):
     return image
 
 
-def loadData(test_type, dimensions):
+def load_data(test_type, dimensions):
 
     data = None
     if test_type == "classification":
@@ -152,7 +153,7 @@ def loadData(test_type, dimensions):
     return data
 
 
-def loadTargets(test_type, dimensions):
+def load_targets(test_type, dimensions):
 
     data = None
     if test_type == "classification" or test_type == "nlp":
@@ -188,7 +189,7 @@ def loadTargets(test_type, dimensions):
     return data
 
 
-def constructOptimizer(sess, output_, target_, loss_function, optimizer, learning_rate, tf_ver_2):
+def construct_optimizer(sess, output_, target_, loss_function, optimizer, learning_rate, tf_ver_2):
 
     if loss_function == "MSE":
         loss_ = 2 * tf.nn.l2_loss(output_ - target_)
@@ -209,7 +210,7 @@ def constructOptimizer(sess, output_, target_, loss_function, optimizer, learnin
     return train_step
 
 
-def getModelSrc(test, testInfo, session):
+def get_model_src(test, testInfo, session):
 
     train_vars = None
 
@@ -227,7 +228,7 @@ def getModelSrc(test, testInfo, session):
 
         target_ = tf.compat.v1.placeholder(tf.float32, test.training[0].getOutputDims())
 
-        train_step_ = constructOptimizer(session, output_, target_,  test.training[0].loss_function,
+        train_step_ = construct_optimizer(session, output_, target_,  test.training[0].loss_function,
                                         test.training[0].optimizer,  test.training[0].learning_rate, testInfo.tf_ver_2)
 
         train_vars = [target_, train_step_]
@@ -247,13 +248,13 @@ def getModelSrc(test, testInfo, session):
     return input_, output_, train_vars
 
 
-def computeStats(results):
+def compute_stats(results):
     if len(results) > 1:
         results = results[1:]
     return np.mean(results), np.std(results)
 
 
-def printTestResults(prefix, batch_size, dimensions, mean, std, verbose):
+def print_test_results(prefix, batch_size, dimensions, mean, std, verbose):
 
     if verbose > 1:
         prefix = "\n" + prefix
@@ -275,7 +276,7 @@ def printTestResults(prefix, batch_size, dimensions, mean, std, verbose):
         print(prt_str)
 
 
-def printIntro():
+def print_intro():
 
     print("\n>>   AI-Benchmark-v.0.1.2   ")
     print(">>   Let the AI Games begin..\n")
@@ -284,7 +285,7 @@ def printIntro():
     # print(">>   𝐿𝑒𝓉 𝓉𝒽𝑒 𝒜𝐼 𝒢𝒶𝓂𝑒𝓈 𝒷𝑒𝑔𝒾𝓃..\n")
 
 
-def printTestInfo(testInfo):
+def print_test_info(testInfo):
 
     print("*  TF Version: " + testInfo.tf_version)
     print("*  Platform: " + testInfo.platform_info)
@@ -305,7 +306,7 @@ def printTestInfo(testInfo):
     update_info("launch", testInfo)
 
 
-def getTFVersion():
+def get_tf_version():
 
     tf_version = "N/A"
 
@@ -317,7 +318,7 @@ def getTFVersion():
     return tf_version
 
 
-def getPlatformInfo():
+def get_platform_info():
 
     platform_info = "N/A"
 
@@ -329,7 +330,7 @@ def getPlatformInfo():
     return platform_info
 
 
-def getCpuModel():
+def get_cpu_model():
 
     cpu_model = "N/A"
 
@@ -341,7 +342,7 @@ def getCpuModel():
     return cpu_model
 
 
-def getNumCpuCores():
+def get_num_cpu_cores():
 
     cpu_cores = -1
 
@@ -353,7 +354,7 @@ def getNumCpuCores():
     return  cpu_cores
 
 
-def getCpuRAM():
+def get_cpu_ram():
 
     pc_ram = "N/A"
 
@@ -365,7 +366,7 @@ def getCpuRAM():
     return pc_ram
 
 
-def isCPUBuild():
+def is_cpu_build():
 
     is_cpu_build = True
 
@@ -378,7 +379,7 @@ def isCPUBuild():
     return is_cpu_build
 
 
-def getGpuModels():
+def get_gpu_models():
 
     gpu_models = [["N/A", "N/A"]]
     gpu_id = 0
@@ -416,7 +417,7 @@ def getGpuModels():
     return gpu_models
 
 
-def getCudaInfo():
+def get_cuda_info():
 
     cuda_version = "N/A"
     cuda_build = "N/A"
@@ -432,18 +433,13 @@ def getCudaInfo():
     return cuda_version, cuda_build
 
 
-def printTestStart():
-
-    time.sleep(1)
+def print_test_start():
     print("\nThe benchmark is running...")
-    time.sleep(1.7)
     print("The tests might take up to 20 minutes")
-    time.sleep(1.7)
     print("Please don't interrupt the script")
-    time.sleep(2)
 
 
-def printScores(testInfo, public_results):
+def print_scores(testInfo, public_results):
 
     c_inference = 10000
     c_training = 10000
@@ -527,8 +523,9 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
     testInfo = TestInfo(_type, precision, use_CPU, verbose)
 
     if verbose > 0:
-        printTestInfo(testInfo)
-        printTestStart()
+        print_test_info(testInfo)
+        print_test_start()
+        time.sleep(2)
 
     benchmark_tests = TestConstructor().getTests()
     benchmark_results = BenchmarkResults()
@@ -560,7 +557,7 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
 
         with tf.Graph().as_default(), session as sess:
 
-            input_, output_, train_vars_ = getModelSrc(test, testInfo, sess)
+            input_, output_, train_vars_ = get_model_src(test, testInfo, sess)
 
             if testInfo.tf_ver_2:
                 tf.compat.v1.global_variables_initializer().run()
@@ -575,25 +572,25 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
 
                 for subTest in (test.inference if inference else test.micro):
 
-                    time_test_started = getTimeSeconds()
+                    time_test_started = get_time_seconds()
                     inference_times = []
 
                     for i in range(subTest.iterations * iter_multiplier):
 
-                        if getTimeSeconds() - time_test_started < subTest.max_duration \
-                                or (i < subTest.min_passes and getTimeSeconds() - time_test_started < MAX_TEST_DURATION) \
+                        if get_time_seconds() - time_test_started < subTest.max_duration \
+                                or (i < subTest.min_passes and get_time_seconds() - time_test_started < MAX_TEST_DURATION) \
                                 or precision == "high":
 
-                            data = loadData(test.type, subTest.getInputDims())
-                            time_iter_started = getTimeMillis()
+                            data = load_data(test.type, subTest.getInputDims())
+                            time_iter_started = get_time_ms()
                             sess.run(output_, feed_dict={input_: data})
-                            inference_time = getTimeMillis() - time_iter_started
+                            inference_time = get_time_ms() - time_iter_started
                             inference_times.append(inference_time)
 
                             if verbose > 1:
                                 print("Inference Time: " + str(inference_time) + " ms")
 
-                    time_mean, time_std = computeStats(inference_times)
+                    time_mean, time_std = compute_stats(inference_times)
 
                     public_id = "%d.%d" % (test.id, sub_id)
                     public_results.test_results[public_id] = Result(time_mean, time_std)
@@ -603,7 +600,7 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
 
                     if verbose > 0:
                         prefix = "%d.%d - inference" % (test.id, sub_id)
-                        printTestResults(prefix, subTest.batch_size, subTest.getInputDims(), time_mean, time_std, verbose)
+                        print_test_results(prefix, subTest.batch_size, subTest.getInputDims(), time_mean, time_std, verbose)
                         sub_id += 1
 
             if training:
@@ -617,7 +614,7 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
                         else:
                             target_ = tf.placeholder(tf.float32, subTest.getOutputDims())
 
-                        train_step = constructOptimizer(sess, output_, target_, subTest.loss_function,
+                        train_step = construct_optimizer(sess, output_, target_, subTest.loss_function,
                                                         subTest.optimizer, subTest.learning_rate, testInfo.tf_ver_2)
 
                     else:
@@ -625,21 +622,21 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
                         target_ = train_vars_[0]
                         train_step = train_vars_[1]
 
-                    time_test_started = getTimeSeconds()
+                    time_test_started = get_time_seconds()
                     training_times = []
 
                     for i in range(subTest.iterations * iter_multiplier):
 
-                        if getTimeSeconds() - time_test_started < subTest.max_duration \
-                                or (i < subTest.min_passes and getTimeSeconds() - time_test_started < MAX_TEST_DURATION) \
+                        if get_time_seconds() - time_test_started < subTest.max_duration \
+                                or (i < subTest.min_passes and get_time_seconds() - time_test_started < MAX_TEST_DURATION) \
                                 or precision == "high":
 
-                            data = loadData(test.type, subTest.getInputDims())
-                            target = loadTargets(test.type, subTest.getOutputDims())
+                            data = load_data(test.type, subTest.getInputDims())
+                            target = load_targets(test.type, subTest.getOutputDims())
 
-                            time_iter_started = getTimeMillis()
+                            time_iter_started = get_time_ms()
                             sess.run(train_step, feed_dict={input_: data, target_: target})
-                            training_time = getTimeMillis() - time_iter_started
+                            training_time = get_time_ms() - time_iter_started
                             training_times.append(training_time)
 
                             if verbose > 1:
@@ -648,7 +645,7 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
                                 else:
                                     print("Training Time: " + str(training_time) + " ms")
 
-                    time_mean, time_std = computeStats(training_times)
+                    time_mean, time_std = compute_stats(training_times)
 
                     public_id = "%d.%d" % (test.id, sub_id)
                     public_results.test_results[public_id] = Result(time_mean, time_std)
@@ -658,13 +655,13 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
 
                     if verbose > 0:
                         prefix = "%d.%d - training " % (test.id, sub_id)
-                        printTestResults(prefix, subTest.batch_size, subTest.getInputDims(), time_mean, time_std, verbose)
+                        print_test_results(prefix, subTest.batch_size, subTest.getInputDims(), time_mean, time_std, verbose)
                         sub_id += 1
 
         sess.close()
 
     testInfo.results = benchmark_results
-    public_results = printScores(testInfo, public_results)
+    public_results = print_scores(testInfo, public_results)
 
     os.chdir(start_dir)
     return public_results
