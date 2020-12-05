@@ -15,8 +15,8 @@ class MainArgumentParser(argparse.ArgumentParser):
             help='0: silent, 1: short summary, 2: more info, 3: TF logs'
         )
         self.add_argument(
-            '-p', '--precision', default='normal', type=str, choices=('normal', 'high'),
-            help='normal or high, if high is selected, the benchmark will execute 10 times more runs for each test.'
+            '-p', '--precision', default='normal', type=str, choices=('normal', 'high', 'dry'),
+            help='normal or high, if high is selected, the benchmark will execute 10 times more runs for each test. dry do not run any iterations.'
         )
 
 

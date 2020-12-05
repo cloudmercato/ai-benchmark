@@ -451,7 +451,11 @@ def printScores(testInfo, public_results):
     if testInfo._type == "full":
 
         inference_score = geometrical_mean(testInfo.results.results_inference_norm)
+        if np.isnan(inference_score):
+            inference_score = 0
         training_score = geometrical_mean(testInfo.results.results_training_norm)
+        if np.isnan(training_score):
+            training_score = 0
 
         testInfo.results.inference_score = int(inference_score * c_inference)
         testInfo.results.training_score = int(training_score * c_training)
@@ -531,9 +535,11 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
     public_results = PublicResults()
     os.chdir(path.dirname(__file__))
 
-    iter_multiplier = 1
-    if precision == "high":
-        iter_multiplier = 10
+    iter_multiplier = {
+        "dry": 0,
+        "normal": 1,
+        "high": 10,
+    }.get(precision, 1)
 
     if use_CPU:
         if testInfo.tf_ver_2:
