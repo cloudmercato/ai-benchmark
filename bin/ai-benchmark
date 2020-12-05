@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-
-import ai_benchmark
-
-benchmark = ai_benchmark.AIBenchmark()
-results = benchmark.run()
+"""Simple AI-Benchmark runner"""
+from ai_benchmark.console import main
+main()
