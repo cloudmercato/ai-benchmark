@@ -18,6 +18,10 @@ class MainArgumentParser(argparse.ArgumentParser):
             '-p', '--precision', default='normal', type=str, choices=('normal', 'high', 'dry'),
             help='normal or high, if high is selected, the benchmark will execute 10 times more runs for each test. dry do not run any iterations.'
         )
+        self.add_argument(
+            '-s', '--seed', default=42, type=int,
+            help='Random seed',
+        )
 
 
 parser = MainArgumentParser()
@@ -32,6 +36,7 @@ def main():
     benchmark = AIBenchmark(
         use_CPU=parsed_args.use_cpu,
         verbose_level=parsed_args.verbose,
+        seed=parsed_args.seed,
     )
     results = benchmark.run(
         precision=parsed_args.precision

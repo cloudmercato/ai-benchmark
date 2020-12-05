@@ -10,7 +10,7 @@ from ai_benchmark import utils
 
 class AIBenchmark:
 
-    def __init__(self, use_CPU=None, verbose_level=1):
+    def __init__(self, use_CPU=None, verbose_level=1, seed=42):
 
         self.tf_ver_2 = utils.parse_version(tf.__version__) > utils.parse_version('1.99')
         self.verbose = verbose_level
@@ -53,7 +53,7 @@ class AIBenchmark:
         except:
             pass
 
-        np.random.seed(42)
+        np.random.seed(seed)
         self.cwd = os.path.dirname(__file__)
 
         self.use_CPU = False
