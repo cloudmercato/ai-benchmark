@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+import json
 from ai_benchmark import config
 
 TEST_IDS = [str(t.id) for t in config.BENCHMARK_TESTS]
@@ -28,6 +29,10 @@ class MainArgumentParser(argparse.ArgumentParser):
             '-t', '--test-ids', default=None, nargs='+', choices=TEST_IDS,
             help="Select test by ID, all by default",
         )
+        self.add_argument(
+            '-j', '--json', action='store_true',
+            help="Output results as JSON",
+        )
 
 
 parser = MainArgumentParser()
@@ -48,6 +53,13 @@ def main():
         precision=parsed_args.precision,
         test_ids=parsed_args.test_ids,
     )
+    if parsed_args.json:
+        output = vars(results)
+        output['test_results'] = {
+            k: vars(v)
+            for k, v in output['test_results'].items()
+        }
+        print(json.dumps(output, indent=4))
 
 
 if __name__ == '__main__':
