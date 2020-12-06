@@ -305,8 +305,10 @@ BENCHMARK_TESTS = [
 
 
 class TestConstructor:
+    BENCHMARK_TESTS = BENCHMARK_TESTS
+
     def get_tests(self, test_ids=None):
-        tests = BENCHMARK_TESTS[::]
+        tests = self.BENCHMARK_TESTS[::]
         if test_ids is not None:
             tests = [t for t in tests if str(t.id) in test_ids]
         return tests

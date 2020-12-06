@@ -49,7 +49,7 @@ def main():
         verbose_level=parsed_args.verbose,
         seed=parsed_args.seed,
     )
-    results = benchmark.run(
+    test_info, results = benchmark.run(
         precision=parsed_args.precision,
         test_ids=parsed_args.test_ids,
     )
@@ -59,6 +59,8 @@ def main():
             k: vars(v)
             for k, v in output['test_results'].items()
         }
+        output['test_info'] = vars(test_info)
+        output['test_info'].pop('results', None)
         print(json.dumps(output, indent=4))
 
 

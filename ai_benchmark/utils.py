@@ -515,6 +515,7 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
               test_ids=None):
 
     testInfo = TestInfo(_type, precision, use_CPU, verbose)
+    testInfo.full_suite = len(test_ids) == len(TestConstructor.BENCHMARK_TESTS) 
 
     print_test_info(testInfo)
     print_test_start()
@@ -652,4 +653,4 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
     public_results = print_scores(testInfo, public_results)
 
     os.chdir(start_dir)
-    return public_results
+    return testInfo, public_results
