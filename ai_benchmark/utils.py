@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright 2019-2020 by Andrey Ignatov. All Rights Reserved.
 
+import sys
 import os
 from os import path
 import subprocess
@@ -66,6 +67,7 @@ class TestInfo:
     def __init__(self, _type, precision, use_CPU, verbose):
 
         self._type = _type
+        self.py_version = sys.version
         self.tf_version = get_tf_version()
         self.tf_ver_2 = parse_version(self.tf_version) > parse_version('1.99')
         self.platform_info = get_platform_info()
