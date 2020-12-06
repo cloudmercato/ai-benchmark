@@ -67,31 +67,10 @@ class AIBenchmark:
         if use_CPU:
             self.use_CPU = True
 
-    def run(self, precision="normal", test_ids=None):
+    def run(self, precision="normal", test_ids=None, training=True, inference=True, micro=False):
         return utils.run_tests(
-            training=True, inference=True, micro=False, verbose=self.verbose,
+            training=training, inference=inference, micro=micro, verbose=self.verbose,
             use_CPU=self.use_CPU, precision=precision, _type="full", start_dir=self.cwd,
-            test_ids=test_ids,
-        )
-
-    def run_inference(self, precision="normal", test_ids=None):
-        return utils.run_tests(
-            training=False, inference=True, micro=False, verbose=self.verbose,
-            use_CPU=self.use_CPU, precision=precision, _type="inference", start_dir=self.cwd,
-            test_ids=test_ids,
-        )
-
-    def run_training(self, precision="normal", test_ids=None):
-        return utils.run_tests(
-            training=True, inference=False, micro=False, verbose=self.verbose,
-            use_CPU=self.use_CPU, precision=precision, _type="training", start_dir=self.cwd,
-            test_ids=test_ids,
-        )
-
-    def run_micro(self, precision="normal", test_ids=None):
-        return utils.run_tests(
-            training=False, inference=False, micro=True, verbose=self.verbose,
-            use_CPU=self.use_CPU, precision=precision, _type="micro", start_dir=self.cwd,
             test_ids=test_ids,
         )
 

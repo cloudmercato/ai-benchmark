@@ -506,16 +506,18 @@ def print_scores(testInfo, public_results):
 
 
 def geometrical_mean(results):
-
     results = np.asarray(results)
-    return results.prod() ** (1.0 / len(results))
+    try:
+        return results.prod() ** (1.0 / len(results))
+    except ZeroDivisionError:
+        return np.nan
 
 
 def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, start_dir,
               test_ids=None):
 
     testInfo = TestInfo(_type, precision, use_CPU, verbose)
-    testInfo.full_suite = len(test_ids) == len(TestConstructor.BENCHMARK_TESTS) 
+    testInfo.full_suite = len(test_ids) == len(TestConstructor.BENCHMARK_TESTS)
 
     print_test_info(testInfo)
     print_test_start()

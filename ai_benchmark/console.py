@@ -14,6 +14,18 @@ class MainArgumentParser(argparse.ArgumentParser):
             help='Run the tests on CPUs  (if tensorflow-gpu is installed)'
         )
         self.add_argument(
+            '-T', '--run-training', default=True, type=int, choices=(0, 1),
+            help='Run training benchmark',
+        )
+        self.add_argument(
+            '-i', '--run-inference', default=True, type=int, choices=(0, 1),
+            help='Run inference benchmark',
+        )
+        self.add_argument(
+            '-m', '--run-micro', default=False, type=int, choices=(0, 1),
+            help='Run micro benchmark',
+        )
+        self.add_argument(
             '-v', '--verbose', default=1, type=int, choices=(0, 1, 2, 3),
             help='0: silent, 1: short summary, 2: more info, 3: TF logs'
         )
@@ -52,6 +64,9 @@ def main():
     test_info, results = benchmark.run(
         precision=parsed_args.precision,
         test_ids=parsed_args.test_ids,
+        training=parsed_args.run_training,
+        inference=parsed_args.run_inference,
+        micro=parsed_args.run_micro,
     )
     if parsed_args.json:
         output = vars(results)
