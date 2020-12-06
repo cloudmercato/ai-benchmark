@@ -511,7 +511,8 @@ def geometrical_mean(results):
     return results.prod() ** (1.0 / len(results))
 
 
-def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, start_dir):
+def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, start_dir,
+              test_ids=None):
 
     testInfo = TestInfo(_type, precision, use_CPU, verbose)
 
@@ -519,7 +520,7 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
     print_test_start()
     time.sleep(2)
 
-    benchmark_tests = TestConstructor().get_tests()
+    benchmark_tests = TestConstructor().get_tests(test_ids)
     benchmark_results = BenchmarkResults()
     public_results = PublicResults()
     os.chdir(path.dirname(__file__))

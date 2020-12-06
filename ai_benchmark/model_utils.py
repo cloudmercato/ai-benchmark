@@ -185,4 +185,3 @@ def diagonal_bilstm(inputs, scope='diagonal_bilstm'):
         output_state_bw_with_last_zeros = tf.concat([output_state_bw_except_last, dummy_zeros], 1)
 
         return output_state_fw + output_state_bw_with_last_zeros
-

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import argparse
+from ai_benchmark import config
 
+TEST_IDS = [str(t.id) for t in config.BENCHMARK_TESTS]
 
 class MainArgumentParser(argparse.ArgumentParser):
     """Parser with AI Benchmark arguments"""
@@ -22,6 +24,10 @@ class MainArgumentParser(argparse.ArgumentParser):
             '-s', '--seed', default=42, type=int,
             help='Random seed',
         )
+        self.add_argument(
+            '-t', '--test-ids', default=None, nargs='+', choices=TEST_IDS,
+            help="Select test by ID, all by default",
+        )
 
 
 parser = MainArgumentParser()
@@ -39,7 +45,8 @@ def main():
         seed=parsed_args.seed,
     )
     results = benchmark.run(
-        precision=parsed_args.precision
+        precision=parsed_args.precision,
+        test_ids=parsed_args.test_ids,
     )
 
 
