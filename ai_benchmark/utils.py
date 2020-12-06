@@ -229,7 +229,7 @@ def get_model_src(test, testInfo, session):
             input_ = tf.compat.v1.placeholder(tf.float32, [None, 64, 64, 3], name="input")
             output_ = PixelRNN(input_)
 
-        target_ = tf.compat.v1.placeholder(tf.float32, test.training[0].getOutputDims())
+        target_ = tf.compat.v1.placeholder(tf.float32, test.training[0].get_output_dims())
 
         train_step_ = construct_optimizer(session, output_, target_,  test.training[0].loss_function,
                                         test.training[0].optimizer,  test.training[0].learning_rate, testInfo.tf_ver_2)
@@ -519,7 +519,7 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
     print_test_start()
     time.sleep(2)
 
-    benchmark_tests = TestConstructor().getTests()
+    benchmark_tests = TestConstructor().get_tests()
     benchmark_results = BenchmarkResults()
     public_results = PublicResults()
     os.chdir(path.dirname(__file__))
@@ -573,7 +573,7 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
                                 or (i < subTest.min_passes and get_time_seconds() - time_test_started < MAX_TEST_DURATION) \
                                 or precision == "high":
 
-                            data = load_data(test.type, subTest.getInputDims())
+                            data = load_data(test.type, subTest.get_input_dims())
                             time_iter_started = get_time_ms()
                             sess.run(output_, feed_dict={input_: data})
                             inference_time = get_time_ms() - time_iter_started
@@ -591,7 +591,7 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
 
                     if verbose > 0:
                         prefix = "%d.%d - inference" % (test.id, sub_id)
-                        print_test_results(prefix, subTest.batch_size, subTest.getInputDims(), time_mean, time_std, verbose)
+                        print_test_results(prefix, subTest.batch_size, subTest.get_input_dims(), time_mean, time_std, verbose)
                         sub_id += 1
 
             if training:
@@ -601,9 +601,9 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
                     if train_vars_ is None:
 
                         if testInfo.tf_ver_2:
-                            target_ = tf.compat.v1.placeholder(tf.float32, subTest.getOutputDims())
+                            target_ = tf.compat.v1.placeholder(tf.float32, subTest.get_output_dims())
                         else:
-                            target_ = tf.placeholder(tf.float32, subTest.getOutputDims())
+                            target_ = tf.placeholder(tf.float32, subTest.get_output_dims())
 
                         train_step = construct_optimizer(sess, output_, target_, subTest.loss_function,
                                                         subTest.optimizer, subTest.learning_rate, testInfo.tf_ver_2)
@@ -622,8 +622,8 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
                                 or (i < subTest.min_passes and get_time_seconds() - time_test_started < MAX_TEST_DURATION) \
                                 or precision == "high":
 
-                            data = load_data(test.type, subTest.getInputDims())
-                            target = load_targets(test.type, subTest.getOutputDims())
+                            data = load_data(test.type, subTest.get_input_dims())
+                            target = load_targets(test.type, subTest.get_output_dims())
 
                             time_iter_started = get_time_ms()
                             sess.run(train_step, feed_dict={input_: data, target_: target})
@@ -642,7 +642,7 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
 
                     if verbose > 0:
                         prefix = "%d.%d - training " % (test.id, sub_id)
-                        print_test_results(prefix, subTest.batch_size, subTest.getInputDims(), time_mean, time_std, verbose)
+                        print_test_results(prefix, subTest.batch_size, subTest.get_input_dims(), time_mean, time_std, verbose)
                         sub_id += 1
 
         sess.close()
