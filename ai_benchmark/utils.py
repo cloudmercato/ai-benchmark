@@ -28,9 +28,7 @@ logger = logging.getLogger('ai_benchmark')
 
 
 class BenchmarkResults:
-
     def __init__(self):
-
         self.results_inference_norm = []
         self.results_training_norm = []
 
@@ -44,17 +42,13 @@ class BenchmarkResults:
 
 
 class Result:
-
     def __init__(self, mean, std):
-
         self.mean = mean
         self.std = std
 
 
 class PublicResults:
-
     def __init__(self):
-
         self.test_results = {}
         self.ai_score = None
 
@@ -63,9 +57,7 @@ class PublicResults:
 
 
 class TestInfo:
-
     def __init__(self, _type, precision, use_CPU, verbose):
-
         self._type = _type
         self.py_version = sys.version
         self.tf_version = get_tf_version()
@@ -259,26 +251,14 @@ def compute_stats(results):
     return np.mean(results), np.std(results)
 
 
-def print_test_results(prefix, batch_size, dimensions, mean, std, verbose):
-
-    if verbose > 1:
-        prefix = "\n" + prefix
-
+def print_test_results(prefix, batch_size, dimensions, mean, std):
     if std > 1 and mean > 100:
-
-        prt_str = "%s | batch=%d, size=%dx%d: %.d ± %.d ms" % (prefix, batch_size, dimensions[1], dimensions[2],
-                                                                   round(mean), round(std))
-
+        prt_str = "%s | batch=%d, size=%dx%d: %.d ± %.d ms" % (
+            prefix, batch_size, dimensions[1], dimensions[2], round(mean), round(std))
     else:
-
-        prt_str = "%s | batch=%d, size=%dx%d: %.1f ± %.1f ms" % (prefix, batch_size, dimensions[1],
-                                                                     dimensions[2], mean, std)
-
-    try:
-        logger.info(prt_str)
-    except:
-        prt_str = prt_str.replace("±", "ms, std:")
-        logger.info(prt_str)
+        prt_str = "%s | batch=%d, size=%dx%d: %.1f ± %.1f ms" % (
+            prefix, batch_size, dimensions[1], dimensions[2], mean, std)
+    logger.info(prt_str)
 
 
 def print_intro():
@@ -303,88 +283,63 @@ def print_test_info(testInfo):
         logger.info("*  CUDA Build: %s", testInfo.cuda_build)
 
     update_info("launch", testInfo)
+    logger.warning("The benchmark is running...")
+    logger.warning("The tests might take up to 20 minutes")
+    logger.warning("Please don't interrupt the script")
 
 
 def get_tf_version():
-
-    tf_version = "N/A"
-
     try:
-        tf_version = tf.__version__
+        return tf.__version__
     except:
         pass
-
-    return tf_version
+    return "N/A"
 
 
 def get_platform_info():
-
     platform_info = "N/A"
-
     try:
-        platform_info = platform.platform()
+        return platform.platform()
     except:
         pass
-
     return platform_info
 
 
 def get_cpu_model():
-
-    cpu_model = "N/A"
-
     try:
-        cpu_model = cpuinfo.get_cpu_info()['brand']
+        return cpuinfo.get_cpu_info()['brand']
     except:
-        pass
-
-    return cpu_model
+        return "N/A"
 
 
 def get_num_cpu_cores():
-
-    cpu_cores = -1
-
     try:
-        cpu_cores = multiprocessing.cpu_count()
+        return multiprocessing.cpu_count()
     except:
-        pass
-
-    return  cpu_cores
+        return -1
 
 
 def get_cpu_ram():
-
-    pc_ram = "N/A"
-
     try:
-        pc_ram = str(round(virtual_memory().total / (1024. ** 3)))
+        return str(round(virtual_memory().total / (1024. ** 3)))
     except:
-        pass
-
-    return pc_ram
+        return "N/A"
 
 
 def is_cpu_build():
-
     is_cpu_build = True
-
     try:
         if tf.test.gpu_device_name():
             is_cpu_build = False
     except:
         pass
-
     return is_cpu_build
 
 
 def get_gpu_models():
-
     gpu_models = [["N/A", "N/A"]]
     gpu_id = 0
-
     try:
-
         tf_gpus = str(device_lib.list_local_devices())
         while tf_gpus.find('device_type: "GPU"') != -1 or tf_gpus.find('device_type: "XLA_GPU"') != -1:
 
@@ -409,18 +364,14 @@ def get_gpu_models():
                 gpu_models.append([gpu_model, gpu_ram])
 
             gpu_id += 1
-
     except:
         pass
-
     return gpu_models
 
 
 def get_cuda_info():
-
     cuda_version = "N/A"
     cuda_build = "N/A"
-
     try:
         cuda_info = str(subprocess.check_output(["nvcc", "--version"]))
         cuda_info = cuda_info[cuda_info.find("release"):]
@@ -428,14 +379,7 @@ def get_cuda_info():
         cuda_build = cuda_info[cuda_info.find(",") + 2:cuda_info.find("\\")]
     except:
         pass
-
     return cuda_version, cuda_build
-
-
-def print_test_start():
-    logger.warning("The benchmark is running...")
-    logger.warning("The tests might take up to 20 minutes")
-    logger.warning("Please don't interrupt the script")
 
 
 def print_scores(testInfo, public_results):
@@ -522,8 +466,7 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
     testInfo.full_suite = len(test_ids) == len(TestConstructor.BENCHMARK_TESTS)
 
     print_test_info(testInfo)
-    print_test_start()
-    time.sleep(2)
+    time.sleep(1)
 
     benchmark_tests = TestConstructor().get_tests(test_ids)
     benchmark_results = BenchmarkResults()
@@ -595,10 +538,9 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
                     benchmark_results.results_inference.append(time_mean)
                     benchmark_results.results_inference_norm.append(float(subTest.ref_time) / time_mean)
 
-                    if verbose > 0:
-                        prefix = "%d.%d - inference" % (test.id, sub_id)
-                        print_test_results(prefix, subTest.batch_size, subTest.get_input_dims(), time_mean, time_std, verbose)
-                        sub_id += 1
+                    prefix = "%d.%d - inference" % (test.id, sub_id)
+                    print_test_results(prefix, subTest.batch_size, subTest.get_input_dims(), time_mean, time_std)
+                    sub_id += 1
 
             if training:
 
@@ -646,10 +588,9 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
                     benchmark_results.results_training.append(time_mean)
                     benchmark_results.results_training_norm.append(float(subTest.ref_time) / time_mean)
 
-                    if verbose > 0:
-                        prefix = "%d.%d - training " % (test.id, sub_id)
-                        print_test_results(prefix, subTest.batch_size, subTest.get_input_dims(), time_mean, time_std, verbose)
-                        sub_id += 1
+                    prefix = "%d.%d - training " % (test.id, sub_id)
+                    print_test_results(prefix, subTest.batch_size, subTest.get_input_dims(), time_mean, time_std)
+                    sub_id += 1
 
         sess.close()
 
