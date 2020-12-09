@@ -57,17 +57,19 @@ class PublicResults:
 
 
 class TestInfo:
-    def __init__(self, _type, precision, use_CPU, verbose):
+    def __init__(self, _type, precision, use_cpu, verbose, cpu_cores, inter_threads, intra_threads):
         self._type = _type
         self.py_version = sys.version
         self.tf_version = get_tf_version()
         self.tf_ver_2 = parse_version(self.tf_version) > parse_version('1.99')
         self.platform_info = get_platform_info()
         self.cpu_model = get_cpu_model()
-        self.cpu_cores = get_num_cpu_cores()
+        self.cpu_cores = cpu_cores or get_num_cpu_cores()
+        self.inter_threads = inter_threads or self.cpu_cores * 2
+        self.intra_threads = intra_threads or self.cpu_cores * 2
         self.cpu_ram = get_cpu_ram()
         self.is_cpu_build = is_cpu_build()
-        self.is_cpu_inference = (is_cpu_build() or use_CPU)
+        self.is_cpu_inference = (is_cpu_build() or use_cpu)
         self.gpu_devices = get_gpu_models()
         self.cuda_version, self.cuda_build = get_cuda_info()
         self.precision = precision
@@ -459,10 +461,21 @@ def geometrical_mean(results):
         return np.nan
 
 
-def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, start_dir,
-              test_ids=None):
-
-    testInfo = TestInfo(_type, precision, use_CPU, verbose)
+def run_tests(
+        training,
+        inference,
+        micro,
+        verbose,
+        use_cpu,
+        precision,
+        _type,
+        start_dir,
+        test_ids=None,
+        cpu_cores=None,
+        inter_threads=None,
+        intra_threads=None,
+    ):
+    testInfo = TestInfo(_type, precision, use_cpu, verbose, cpu_cores, inter_threads, intra_threads)
     testInfo.full_suite = len(test_ids) == len(TestConstructor.BENCHMARK_TESTS)
 
     print_test_info(testInfo)
@@ -479,11 +492,13 @@ def run_tests(training, inference, micro, verbose, use_CPU, precision, _type, st
         "high": 10,
     }.get(precision, 1)
 
-    if use_CPU:
-        if testInfo.tf_ver_2:
-            config = tf.compat.v1.ConfigProto(device_count={'GPU': 0})
-        else:
-            config = tf.ConfigProto(device_count={'GPU': 0})
+    ConfigProto = tf.compat.v1.ConfigProto if testInfo.tf_ver_2 else tf.ConfigProto
+    if use_cpu:
+        config = ConfigProto(
+            device_count={'GPU': 0, 'CPU': testInfo.cpu_cores},
+            inter_op_parallelism_threads=testInfo.inter_threads,
+            intra_op_parallelism_threads=testInfo.intra_threads,
+        )
     else:
         config = None
 

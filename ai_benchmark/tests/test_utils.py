@@ -11,7 +11,7 @@ class RunTestsTest(unittest.TestCase):
             inference=True,
             micro=False,
             verbose=0,
-            use_CPU=None,
+            use_cpu=None,
             precision='dry',
             _type="full",
             start_dir=os.path.dirname(__file__),

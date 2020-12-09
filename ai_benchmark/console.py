@@ -14,6 +14,18 @@ class MainArgumentParser(argparse.ArgumentParser):
             help='Run the tests on CPUs  (if tensorflow-gpu is installed)'
         )
         self.add_argument(
+            '-C', '--cpu-cores', default=None, type=int,
+            help='Number of CPU cores to use.',
+        )
+        self.add_argument(
+            '-b', '--intra-threads', default=None, type=int,
+            help='inter_op_parallelism_threads'
+        )
+        self.add_argument(
+            '-B', '--inter-threads', default=None, type=int,
+            help='intra_op_parallelism_threads'
+        )
+        self.add_argument(
             '-T', '--run-training', default=True, type=int, choices=(0, 1),
             help='Run training benchmark',
         )
@@ -57,7 +69,7 @@ def main():
     parsed_args = parser.parse_known_args()[0]
 
     benchmark = AIBenchmark(
-        use_CPU=parsed_args.use_cpu,
+        use_cpu=parsed_args.use_cpu,
         verbose_level=parsed_args.verbose,
         seed=parsed_args.seed,
     )
@@ -67,6 +79,9 @@ def main():
         training=parsed_args.run_training,
         inference=parsed_args.run_inference,
         micro=parsed_args.run_micro,
+        cpu_cores=parsed_args.cpu_cores,
+        inter_threads=parsed_args.inter_threads,
+        intra_threads=parsed_args.intra_threads,
     )
     if parsed_args.json:
         output = vars(results)
