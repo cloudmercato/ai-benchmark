@@ -58,7 +58,9 @@ class PublicResults:
 
 class TestInfo:
     def __init__(self, _type, precision, use_cpu, verbose, cpu_cores, inter_threads, intra_threads):
+        from ai_benchmark import __version__
         self._type = _type
+        self.version = __version__
         self.py_version = sys.version
         self.tf_version = get_tf_version()
         self.tf_ver_2 = parse_version(self.tf_version) > parse_version('1.99')
