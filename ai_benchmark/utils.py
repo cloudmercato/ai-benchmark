@@ -478,7 +478,10 @@ def run_tests(
         intra_threads=None,
     ):
     testInfo = TestInfo(_type, precision, use_cpu, verbose, cpu_cores, inter_threads, intra_threads)
-    testInfo.full_suite = len(test_ids) == len(TestConstructor.BENCHMARK_TESTS)
+    testInfo.full_suite = (
+        test_ids is None or
+        len(test_ids) == len(TestConstructor.BENCHMARK_TESTS)
+    )
 
     print_test_info(testInfo)
     time.sleep(1)
