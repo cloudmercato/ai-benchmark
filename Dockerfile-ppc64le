@@ -1,0 +1,7 @@
+FROM ibmcom/tensorflow-ppc64le:1.15.3-gpu
+ENV UNIT=cpu
+
+WORKDIR /ai-benchmark
+ADD . /ai-benchmark
+
+RUN pip install .
