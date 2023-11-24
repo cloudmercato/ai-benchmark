@@ -7,5 +7,5 @@ handler = logging.StreamHandler()
 logger = logging.getLogger('ai_benchmark')
 logger.addHandler(handler)
 
-VERSION = (0, 1, 3, 'cm')
+VERSION = (0, 1, 4, 'cm')
 __version__ = '.'.join([str(i) for i in VERSION])
