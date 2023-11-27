@@ -15,8 +15,6 @@ class AIBenchmark:
 
         utils.print_intro()
 
-        np.warnings.filterwarnings('ignore')
-
         try:
             if verbose_level < 3:
                 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
