@@ -26,22 +26,15 @@ For more information and results, please visit the project website: [http://ai-b
 
 #### Installation Instructions </br>
 
-The benchmark requires TensorFlow machine learning library to be present in your system.
+The benchmark requires the TensorFlow machine learning library to be present in your system.
 
-On systems that <b>do not have Nvidia GPUs</b>, run the following commands to install AI Benchmark:
+Run the following commands to install AI Benchmark:
 
 ```bash
 pip install tensorflow
 pip install ai-benchmark
 ```
 </br>
-
-If you want to check the <b>performance of Nvidia graphic cards</b>, run the following commands:
-
-```bash
-pip install tensorflow-gpu
-pip install ai-benchmark
-```
 
 <b>`Note 1:`</b> If Tensorflow is already installed in your system, you can skip the first command.
 
